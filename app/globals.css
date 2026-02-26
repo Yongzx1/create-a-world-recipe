@@ -125,3 +125,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Ensure React Flow edges stay visible on dark background */
+.react-flow__edge-path,
+.xyflow__edge-path {
+  stroke: #38bdf8;
+  stroke-width: 2;
+}
