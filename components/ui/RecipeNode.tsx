@@ -12,7 +12,7 @@ const RecipeNode: React.FC<RecipeNodeProps> = ({ data }) => {
   const { label, icon, role } = data
 
   const baseCardClasses =
-    "flex flex-col items-center justify-center rounded-2xl border px-5 py-4 shadow-lg min-w-[150px]"
+    "inline-flex w-fit flex-col items-center justify-center rounded-2xl border px-5 py-4 shadow-lg min-w-[150px]"
 
   const roleClasses: Record<NodeRole, string> = {
     result:
