@@ -1,6 +1,6 @@
 import React from "react"
 import Image from "next/image"
-import { Handle, Position } from "react-flow-renderer"
+import { Handle, Position } from "@xyflow/react"
 
 type NodeRole = "result" | "intermediate" | "base"
 

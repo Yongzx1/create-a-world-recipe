@@ -1,12 +1,13 @@
 "use client"
 
 import React from "react"
-import ReactFlow, {
+import {
+  ReactFlow,
   Node,
   Edge,
   ReactFlowProvider,
   Background,
-} from "react-flow-renderer"
+} from "@xyflow/react"
 import RecipeNode from "./RecipeNode"
 import { items } from "@/data/items"
 
