@@ -33,44 +33,28 @@ const RecipeNode: React.FC<RecipeNodeProps> = ({ data }) => {
     <div className={`relative ${baseCardClasses} ${roleClasses[role]}`}>
       {/* Handles depend on node role so connections look tidy */}
       {role === "result" && (
-        <>
-          <Handle
-            id="target-left"
-            type="target"
-            position={Position.Bottom}
-            className="!w-2 !h-2 !bg-slate-400 border-0"
-            style={{ left: "32%" }}
-          />
-          <Handle
-            id="target-right"
-            type="target"
-            position={Position.Bottom}
-            className="!w-2 !h-2 !bg-slate-400 border-0"
-            style={{ left: "68%" }}
-          />
-        </>
+        <Handle
+          id="target"
+          type="target"
+          position={Position.Bottom}
+          className="w-2! h-2! bg-slate-400! border-0"
+          style={{ left: "50%" }}
+        />
       )}
 
       {role === "intermediate" && (
         <>
           <Handle
-            id="target-left"
+            id="target"
             type="target"
             position={Position.Bottom}
-            className="!w-2 !h-2 !bg-slate-400 border-0"
-            style={{ left: "32%" }}
-          />
-          <Handle
-            id="target-right"
-            type="target"
-            position={Position.Bottom}
-            className="!w-2 !h-2 !bg-slate-400 border-0"
-            style={{ left: "68%" }}
+            className="w-2! h-2! bg-slate-400! border-0"
+            style={{ left: "50%" }}
           />
           <Handle
             type="source"
             position={Position.Top}
-            className="!w-2 !h-2 !bg-slate-400 border-0"
+            className="w-2! h-2! bg-slate-400! border-0"
           />
         </>
       )}
@@ -79,7 +63,7 @@ const RecipeNode: React.FC<RecipeNodeProps> = ({ data }) => {
         <Handle
           type="source"
           position={Position.Top}
-          className="!w-2 !h-2 !bg-slate-400 border-0"
+          className="w-2! h-2! bg-slate-400! border-0"
         />
       )}
 

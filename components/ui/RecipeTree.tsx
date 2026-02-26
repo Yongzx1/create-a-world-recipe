@@ -6,7 +6,6 @@ import ReactFlow, {
   Edge,
   ReactFlowProvider,
   Background,
-  Position,
 } from "react-flow-renderer"
 import RecipeNode from "./RecipeNode"
 import { items } from "@/data/items"
@@ -26,61 +25,59 @@ const recipes: Record<string, string[]> = {
 export default function RecipeTree({ selectedItemId }: RecipeTreeProps) {
   const selectedItem = items.find((item) => item.id === selectedItemId) ?? items[0]
 
-  // Build a small multi-level graph so that
-  // - level 0: selected item
-  // - level 1: its ingredients
-  // - level 2: ingredients of those ingredients (e.g. gravel for sand)
+  // Tree (not DAG): if the same ingredient appears in multiple branches,
+  // we intentionally render it as a separate node instance for clarity.
   const maxDepth = 2
-  const nodeLevels: Record<string, number> = { [selectedItem.id]: 0 }
-  const layers: string[][] = [[selectedItem.id]]
+  const layers: { instanceId: string; itemId: string }[][] = [
+    [{ instanceId: selectedItem.id, itemId: selectedItem.id }],
+  ]
   const edges: Edge[] = []
 
-  const queue: { id: string; level: number }[] = [{ id: selectedItem.id, level: 0 }]
+  const queue: { instanceId: string; itemId: string; level: number }[] = [
+    { instanceId: selectedItem.id, itemId: selectedItem.id, level: 0 },
+  ]
 
   while (queue.length) {
-    const { id, level } = queue.shift()!
+    const { instanceId, itemId, level } = queue.shift()!
     if (level >= maxDepth) continue
 
-    const ingredientIds = recipes[id] ?? []
+    const ingredientIds = recipes[itemId] ?? []
 
     ingredientIds.forEach((ingredientId, ingredientIndex) => {
+      const childInstanceId = `${ingredientId}__${instanceId}__${ingredientIndex}`
+
       edges.push({
-        id: `e-${ingredientId}-${id}`,
-        source: ingredientId,
-        target: id,
-        sourcePosition: Position.Top,
-        targetPosition: Position.Bottom,
-        targetHandle: ingredientIndex % 2 === 0 ? "target-left" : "target-right",
+        id: `e-${childInstanceId}-${instanceId}`,
+        source: childInstanceId,
+        target: instanceId,
+        targetHandle: "target",
         animated: true,
         style: { stroke: "#38bdf8", strokeWidth: 2 },
       })
 
-      if (nodeLevels[ingredientId] === undefined) {
-        const nextLevel = level + 1
-        nodeLevels[ingredientId] = nextLevel
-        if (!layers[nextLevel]) layers[nextLevel] = []
-        layers[nextLevel].push(ingredientId)
-        queue.push({ id: ingredientId, level: nextLevel })
-      }
+      const nextLevel = level + 1
+      if (!layers[nextLevel]) layers[nextLevel] = []
+      layers[nextLevel].push({ instanceId: childInstanceId, itemId: ingredientId })
+      queue.push({ instanceId: childInstanceId, itemId: ingredientId, level: nextLevel })
     })
   }
 
   const nodes: Node[] = []
 
-  layers.forEach((layerIds, level) => {
-    layerIds.forEach((id, index) => {
-      const item = items.find((i) => i.id === id)
+  layers.forEach((layer, level) => {
+    layer.forEach(({ instanceId, itemId }, index) => {
+      const item = items.find((i) => i.id === itemId)
       if (!item) return
 
       const role =
-        id === selectedItem.id
+        instanceId === selectedItem.id
           ? "result"
-          : recipes[id]
-          ? "intermediate"
-          : "base"
+          : recipes[itemId]
+            ? "intermediate"
+            : "base"
 
       nodes.push({
-        id: item.id,
+        id: instanceId,
         type: "custom",
         data: { label: item.name, icon: item.icon, role },
         position: { x: 100 + index * 220, y: 40 + level * 190 },
