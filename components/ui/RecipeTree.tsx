@@ -13,21 +13,43 @@ import { items } from "@/data/items"
 
 type RecipeTreeProps = {
   selectedItemId: string
+  direction: "result-top" | "result-bottom"
 }
 
 const recipes: Record<string, string[]> = {
+  //Rarity 1–3
+  "cave-gateway": ["cave-background", "stone"],
   grass: ["dirt", "cave-background"],
   gravel: ["dirt", "stone"],
-  "cave-gateway": ["cave-background", "stone"],
   "wooden-block": ["dirt", "magma"],
+  "agaric-mushroom": ["cave-background", "grass"],
+  concrete: ["gravel", "stone"],
+  "glass-pane": ["magma", "gravel"],
   sand: ["dirt", "gravel"],
+  sunflower: ["grass", "magma"],
+  torch: ["wooden-block", "magma"],
+  "wooden-background": ["cave-background", "stone"],
+  //Rarity 4–6
+  "black-block": ["concrete", "cave-background"],
+  "brown-block": ["concrete", "dirt"],
+  "glass-block": ["sand", "magma"],
+  "wooden-frame": ["grass", "wooden-block"],
+  "wooden-sign": ["cave-background", "wooden-background"],
+  cactus: ["grass", "sand"],
+  "corn-flower": ["grass", "glass-pane"],
+  "green-block": ["grass", "concrete"],
+  "wooden-crate": ["dirt", "wooden-sign"],
+  "wooden-log": ["wooden-block", "wooden-background"],
+  "red-block": ["concrete", "agaric-mushroom"],
+  "orange-block": ["yellow-block", "red-block"],
+  "white-block": ["concrete", "glass-pane"],
+  "yellow-block": ["sunflower", "concrete"],
+  leaves: ["grass", "wooden-block"],
 }
 
-export default function RecipeTree({ selectedItemId }: RecipeTreeProps) {
+export default function RecipeTree({ selectedItemId, direction }: RecipeTreeProps) {
   const selectedItem = items.find((item) => item.id === selectedItemId) ?? items[0]
 
-  // Tree (not DAG): if the same ingredient appears in multiple branches,
-  // we intentionally render it as a separate node instance for clarity.
   const maxDepth = 2
   const layers: { instanceId: string; itemId: string }[][] = [
     [{ instanceId: selectedItem.id, itemId: selectedItem.id }],
@@ -65,31 +87,40 @@ export default function RecipeTree({ selectedItemId }: RecipeTreeProps) {
 
   const nodes: Node[] = []
 
-  layers.forEach((layer, level) => {
-    layer.forEach(({ instanceId, itemId }, index) => {
-      const item = items.find((i) => i.id === itemId)
-      if (!item) return
+layers.forEach((layer, level) => {
+  layer.forEach(({ instanceId, itemId }, index) => {
+    const item = items.find((i) => i.id === itemId)
+    if (!item) return
 
-      const role =
-        instanceId === selectedItem.id
-          ? "result"
-          : recipes[itemId]
-            ? "intermediate"
-            : "base"
+    const role =
+      instanceId === selectedItem.id
+        ? "result"
+        : recipes[itemId]
+          ? "intermediate"
+          : "base"
 
-      nodes.push({
-        id: instanceId,
-        type: "custom",
-        data: { label: item.name, icon: item.icon, role },
-        position: { x: 100 + index * 220, y: 40 + level * 190 },
-        style: { background: "transparent", border: "none" },
-      })
+    const y =
+      direction === "result-top"
+        ? 40 + level * 190
+        : 40 + (maxDepth - level) * 190
+
+    const ingredientNames = (recipes[itemId] ?? []).map(
+      (id) => items.find((i) => i.id === id)?.name ?? id
+    )
+
+    nodes.push({
+      id: instanceId,
+      type: "custom",
+      data: { label: item.name, icon: item.icon, role, recipe: ingredientNames },
+      position: { x: 100 + index * 220, y },
+      style: { background: "transparent", border: "none" },
     })
   })
+})
 
   return (
     <ReactFlowProvider>
-      <div className="flex-1 w-full h-screen bg-zinc-900">
+      <div className="flex-1 w-full h-full bg-zinc-900">
         <ReactFlow
           nodes={nodes}
           edges={edges}

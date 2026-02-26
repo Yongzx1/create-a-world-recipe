@@ -1,15 +1,16 @@
-import React from "react"
+import React, { useState } from "react"
 import Image from "next/image"
 import { Handle, Position } from "@xyflow/react"
 
 type NodeRole = "result" | "intermediate" | "base"
 
 interface RecipeNodeProps {
-  data: { label: string; icon: string; role: NodeRole }
+  data: { label: string; icon: string; role: NodeRole; recipe?: string[] }
 }
 
 const RecipeNode: React.FC<RecipeNodeProps> = ({ data }) => {
-  const { label, icon, role } = data
+  const { label, icon, role, recipe } = data
+  const [hovered, setHovered] = useState(false)
 
   const baseCardClasses =
     "inline-flex w-fit flex-col items-center justify-center rounded-2xl border px-5 py-4 shadow-lg min-w-[150px]"
@@ -30,8 +31,26 @@ const RecipeNode: React.FC<RecipeNodeProps> = ({ data }) => {
   }
 
   return (
-    <div className={`relative ${baseCardClasses} ${roleClasses[role]}`}>
-      {/* Handles depend on node role so connections look tidy */}
+    <div
+      className={`relative ${baseCardClasses} ${roleClasses[role]}`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Tooltip */}
+      {hovered && recipe && recipe.length > 0 && (
+        <div className="absolute -top-11 left-1/2 -translate-x-1/2 z-50 pointer-events-none
+          whitespace-nowrap bg-zinc-800/95 border border-zinc-600 text-zinc-200
+          text-xs px-3 py-1.5 rounded-lg shadow-xl">
+          <span className="text-zinc-400">Requires: </span>
+          {recipe.map((name, i) => (
+            <span key={name}>
+              <span className="text-white font-medium">{name}</span>
+              {i < recipe.length - 1 && <span className="text-zinc-400 mx-1">+</span>}
+            </span>
+          ))}
+        </div>
+      )}
+
       {role === "result" && (
         <Handle
           id="target"
