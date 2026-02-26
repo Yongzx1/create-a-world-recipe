@@ -82,6 +82,7 @@ export default function RecipeTree({ selectedItemId }: RecipeTreeProps) {
         type: "custom",
         data: { label: item.name, icon: item.icon, role },
         position: { x: 100 + index * 220, y: 40 + level * 190 },
+        style: { background: "transparent", border: "none" },
       })
     })
   })
