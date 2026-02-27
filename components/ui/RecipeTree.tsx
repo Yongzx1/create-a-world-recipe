@@ -50,7 +50,7 @@ const recipes: Record<string, string[]> = {
 export default function RecipeTree({ selectedItemId, direction }: RecipeTreeProps) {
   const selectedItem = items.find((item) => item.id === selectedItemId) ?? items[0]
 
-  const maxDepth = 2
+  const maxDepth = 5
   const layers: { instanceId: string; itemId: string }[][] = [
     [{ instanceId: selectedItem.id, itemId: selectedItem.id }],
   ]
@@ -126,6 +126,7 @@ layers.forEach((layer, level) => {
           edges={edges}
           nodeTypes={{ custom: RecipeNode }}
           fitView
+          proOptions={{ hideAttribution: true }}
         >
           <Background gap={24} color="#1f2937" />
         </ReactFlow>
